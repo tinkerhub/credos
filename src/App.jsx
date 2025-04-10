@@ -121,7 +121,7 @@ function App() {
       case 'image':
         return (
           <div className="image-container">
-            <img src={credo.content} alt="TinkerHub Credo" />
+            <img src={credo.content} alt="TinkerHub Credo" className="image-content" />
           </div>
         );
       
@@ -166,6 +166,9 @@ function App() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      <div className="logo-container">
+        <img src="/logo.svg" alt="TinkerHub Logo" className="header-logo" />
+      </div>
       <animated.div className="credo-container" style={props}>
         {renderCredo()}
       </animated.div>
