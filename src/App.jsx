@@ -5,6 +5,14 @@ import { useSpring, animated } from 'react-spring';
 import { getRandomColor } from './utils/colorUtils';
 import { playSound } from './utils/audioUtils';
 
+/**
+ * Main App component that handles the TinkerHub Credos presentation
+ * Features include:
+ * - Loading and displaying credos from CSV
+ * - Keyboard and touch navigation
+ * - Dynamic background colors
+ * - Support for text, image, and video content
+ */
 function App() {
   const [credos, setCredos] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -13,14 +21,14 @@ function App() {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
-  // Animation properties
+  // Animation properties for smooth transitions
   const props = useSpring({
     opacity: isTransitioning ? 0 : 1,
     transform: isTransitioning ? 'scale(0.8)' : 'scale(1)',
     config: { tension: 300, friction: 20 }
   });
 
-  // Load CSV data
+  // Loads and parses the CSV file containing credos
   useEffect(() => {
     fetch('/credos.csv')
       .then(response => {
@@ -35,7 +43,6 @@ function App() {
           complete: (results) => {
             if (results.data && results.data.length > 0) {
               setCredos(results.data);
-              // Set initial background color
               setBackgroundColor(getRandomColor());
             }
           },
@@ -49,13 +56,11 @@ function App() {
       });
   }, []);
 
-  // Handle navigation
+  // Handles navigation between credos with animation and sound effects
   const navigate = useCallback((direction) => {
     if (isTransitioning || credos.length === 0) return;
 
     setIsTransitioning(true);
-    
-    // Play transition sound
     playSound('slide');
 
     setTimeout(() => {
@@ -76,7 +81,7 @@ function App() {
     }, 300);
   }, [credos, currentIndex, isTransitioning]);
 
-  // Keyboard navigation
+  // Sets up keyboard navigation event listeners
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.code === 'Space' || e.code === 'ArrowRight') {
@@ -90,7 +95,7 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [navigate]);
 
-  // Touch navigation
+  // Handles touch navigation for mobile devices
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -99,7 +104,7 @@ function App() {
     touchEndX.current = e.changedTouches[0].clientX;
     const diff = touchStartX.current - touchEndX.current;
 
-    if (Math.abs(diff) > 50) { // Minimum swipe distance
+    if (Math.abs(diff) > 50) {
       if (diff > 0) {
         navigate('next');
       } else {
@@ -108,7 +113,7 @@ function App() {
     }
   };
 
-  // Render current credo
+  // Renders the current credo based on its type
   const renderCredo = () => {
     if (credos.length === 0) return <div className="loading">Loading...</div>;
 
@@ -120,18 +125,17 @@ function App() {
       
       case 'image':
         return (
-          <div className="image-container">
-            <img src={credo.content} alt="TinkerHub Credo" className="image-content" />
+          <div className="media-container">
+            <img src={credo.content} alt="TinkerHub Credo" className="media-content" />
           </div>
         );
       
       case 'video':
-        // Extract YouTube video ID
         const videoId = credo.content.split('v=')[1]?.split('&')[0];
         if (!videoId) return <div>Invalid YouTube URL</div>;
         
         return (
-          <div className="video-container">
+          <div className="media-container">
             <YouTube 
               videoId={videoId} 
               opts={{
@@ -159,28 +163,48 @@ function App() {
     }
   };
 
+  // Calculate text color based on background brightness
+  const isDarkBackground = () => {
+    const color = backgroundColor.replace('#', '');
+    const r = parseInt(color.substr(0, 2), 16);
+    const g = parseInt(color.substr(2, 2), 16);
+    const b = parseInt(color.substr(4, 2), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness < 128;
+  };
+
   return (
     <div 
       className="app-container"
-      style={{ backgroundColor }}
+      style={{ 
+        backgroundColor,
+        '--text-color': isDarkBackground() ? '#ffffff' : '#000000',
+        '--logo-filter': isDarkBackground() ? 'invert(1)' : 'none'
+      }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
+      onClick={() => navigate('next')}
     >
       <div className="logo-container">
-        <img src="/logo.svg" alt="TinkerHub Logo" className="header-logo" />
+        <img 
+          src="/logo.svg" 
+          alt="TinkerHub Logo" 
+          className="header-logo"
+        />
       </div>
+      
       <animated.div className="credo-container" style={props}>
         {renderCredo()}
       </animated.div>
       
       <div className="navigation">
-        <button onClick={() => navigate('prev')} className="nav-button prev">&lt;</button>
         <div className="progress">
           {credos.map((_, index) => (
             <div 
               key={index} 
               className={`progress-dot ${index === currentIndex ? 'active' : ''}`}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 if (index !== currentIndex) {
                   setIsTransitioning(true);
                   playSound('pop');
@@ -197,8 +221,11 @@ function App() {
             />
           ))}
         </div>
-        <button onClick={() => navigate('next')} className="nav-button next">&gt;</button>
       </div>
+
+      <footer className="footer">
+        Use space or arrow keys to navigate
+      </footer>
     </div>
   );
 }

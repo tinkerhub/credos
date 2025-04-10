@@ -1,74 +1,93 @@
-# TinkerHub Credos Viewer
+# TinkerHub Credos
 
-A React application that displays TinkerHub credos in a slideshow format. The application shows one credo at a time with randomized background colors. Users can navigate through the credos using keyboard controls (spacebar, arrow keys) or touch controls on mobile devices.
+A dynamic presentation application for TinkerHub Credos, featuring text, images, and videos with smooth transitions and interactive navigation.
 
 ## Features
 
-- Displays text, images, and videos from a CSV file
-- Randomized background colors for each credo
-- Keyboard navigation (spacebar, arrow keys)
-- Touch controls for mobile devices
-- Responsive design for all screen sizes
-- First item always fixed as an intro
-- YouTube video embedding with previews
+- Dynamic background colors
+- Support for text, image, and video content
+- Keyboard and touch navigation
+- Responsive design
+- Automatic color contrast adjustment
+- Progress indicators
+- Smooth animations
 
-## Getting Started
+## Installation
 
-### Prerequisites
+1. Clone the repository:
+```bash
+git clone https://github.com/tinkerhub/credos.git
+cd credos
+```
 
-- Node.js (v14 or higher)
-- npm or yarn
-
-### Installation
-
-1. Clone the repository or download the source code
-2. Navigate to the project directory
-3. Install dependencies:
-
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-### Running the Application
-
-Start the development server:
-
+3. Start the development server:
 ```bash
 npm run dev
 ```
 
-The application will be available at http://localhost:3000
+4. Open your browser and navigate to `http://localhost:5173`
 
-### Building for Production
+## Modifying Content
 
-Create a production build:
+### Adding/Editing Credos
 
-```bash
-npm run build
+1. Open `credos.csv` in your preferred text editor
+2. The CSV file should have the following columns:
+   - `type`: Can be 'text', 'image', 'video', or 'intro'
+   - `content`: The actual content (text, image URL, or YouTube URL)
+
+Example:
+```csv
+type,content
+text,This is a sample credo
+image,https://example.com/image.jpg
+video,https://www.youtube.com/watch?v=VIDEO_ID
 ```
 
-Preview the production build:
+### Customizing Styles
 
-```bash
-npm run preview
+1. Open `src/App.css` to modify the visual styles
+2. Key sections to customize:
+   - `.app-container`: Main container styles
+   - `.media-container`: Image and video container styles
+   - `.text-credo`: Text content styles
+   - `.progress-dot`: Navigation indicator styles
+
+### Adding New Features
+
+1. Main application logic is in `src/App.jsx`
+2. Key functions:
+   - `navigate`: Handles slide transitions
+   - `renderCredo`: Renders different types of content
+   - `isDarkBackground`: Calculates text color based on background
+
+## Project Structure
+
+```
+credos/
+├── src/
+│   ├── App.jsx        # Main application component
+│   ├── App.css        # Styles
+│   └── utils/         # Utility functions
+├── public/
+│   ├── logo.svg       # TinkerHub logo
+│   └── credos.csv     # Content file
+├── package.json       # Project dependencies
+└── vite.config.js     # Vite configuration
 ```
 
-## Customizing Credos
+## Contributing
 
-The credos are loaded from a CSV file located in the `public` directory. You can modify the `credos.csv` file to add, remove, or update credos.
-
-The CSV file has the following columns:
-
-- `type`: The type of content (text, image, video, intro)
-- `content`: The content to display (text, image URL, video URL)
-- `description`: A description of the content (displayed as the title)
-
-## Usage
-
-- Press the **spacebar** or **right arrow key** to go to the next credo
-- Press the **left arrow key** to go to the previous credo
-- On mobile devices, use the arrow buttons at the bottom of the screen
+1. Fork the repository
+2. Create a new branch for your feature
+3. Make your changes
+4. Submit a pull request
 
 ## License
 
-This project is open source and available under the MIT License.
+This project is licensed under the MIT License - see the LICENSE file for details.
